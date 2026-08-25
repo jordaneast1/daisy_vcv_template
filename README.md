@@ -1,3 +1,7 @@
+An experimental project to see if VCV Rack can be used to prototype Daisy hardware modules with DaisySP
+
+Claude used to generate boilerplate.
+
 ## Project layout
 
 ```

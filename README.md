@@ -1,20 +1,22 @@
 ## Daisy Set up
-#clone with submodules
-git clone --recursive https://github.com/electro-smith/DaisyExamples
+clone with submodules
+```
+git clone --recursive https://github.com/jordaneast1/daisy_vcv_template
 ```
 
 or
 
 ```sh
-git clone https://github.com/electro-smith/DaisyExamples
+git clone https://github.com/jordaneast1/daisy_vcv_template
 git submodule update --init
 ```
 
-best shell for this on Windows is Git Bash
+shell for this on Windows is Git Bash
 
-$ cd into /daisy 
+$ cd into daisy 
 
-```sh 
+```sh
+cd daisy 
 #first build the project
 make
 #then flash the hardware
@@ -30,10 +32,11 @@ To pull everything for the repo and submodules:
 git pull --recurse-submodules
 ```
 
-#rebuild the libs
+rebuild the libs
+```
 make -C libDaisy
 make -C DaisySP
-
+```
 
 ## VCV set-up
 Install VCV Rack 2
@@ -46,27 +49,7 @@ Ensure the VCV Rack-SDK is installed and set on $PATH
 
 
 ```sh
-cd /vcv
+cd vcv
 make
 make install
 ```
-
-
-
-
-
-
-
-
-### Create new example project
-
-Creates a brand new example project containing a Makefile, compilable source file,
-and debug resources for VisualStudio using VisualGDB, and for VS Code using Cortex Debug.
-
-The board option can be any of the following:
-
-field, patch, petal, pod, seed, versio
-
-`./helper.py create pod/MyNewProject --board seed`
-
-# daisy_vcv_template

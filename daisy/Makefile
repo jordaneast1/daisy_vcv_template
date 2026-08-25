@@ -2,7 +2,10 @@
 TARGET = template
 
 # Sources
-CPP_SOURCES = template.cpp
+# SharedDSP.cpp holds the DSP that this firmware and the VCV Rack module both use.
+SHARED_DIR = ../shared
+CPP_SOURCES = template.cpp $(SHARED_DIR)/SharedDSP.cpp
+C_INCLUDES += -I$(SHARED_DIR)
 
 # Library Locations
 LIBDAISY_DIR = ../libDaisy

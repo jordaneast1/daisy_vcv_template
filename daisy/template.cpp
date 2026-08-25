@@ -1,54 +1,44 @@
 #include "daisy_seed.h"
-#include "daisysp.h"
+#include "SharedDSP.h"
 
 // Use the daisy namespace to prevent having to type
 // daisy:: before all libdaisy functions
 using namespace daisy;
-using namespace daisysp;
 
 // Declare a DaisySeed object called hardware
-DaisySeed  hardware;
-Oscillator osc;
-Adsr       env;
+DaisySeed hardware;
 
 //Configure and initialize button
 Switch button1;
+
+// All of the DSP lives in ../shared, so the VCV Rack module can run the
+// same voice. Everything in this file is Daisy hardware "front panel".
+shared::SharedDSP voice;
 
 void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
                    AudioHandle::InterleavingOutputBuffer out,
                    size_t                                size)
 {
-    float osc_out, env_out;
-    bool  gate;
-
     //Nobody likes a bouncy button
     button1.Debounce();
 
     //Hold the button to hold the envelope at its sustain level
-    gate = button1.Pressed();
+    bool gate = button1.Pressed();
 
     //Light the onboard LED while the button is held down
     hardware.SetLed(gate);
 
-    //Convert floating point knob to midi (0-127)
-    //Then convert midi to freq. in Hz
-    osc.SetFreq(mtof(hardware.adc.GetFloat(0) * 127));
+    //Read the knob, which the shared voice maps to pitch
+    float pitch_knob = hardware.adc.GetFloat(0);
 
     //Fill the block with samples
     for(size_t i = 0; i < size; i += 2)
     {
-        //Get the next envelope value
-        //While the gate is high the envelope rises and holds at sustain,
-        //when it goes low the envelope releases
-        env_out = env.Process(gate);
-        //Set the oscillator volume to the latest env value
-        osc.SetAmp(env_out);
-        //get the next oscillator sample
-        osc_out = osc.Process();
+        float sig = voice.Process(pitch_knob, gate);
 
         //Set the left and right outputs
-        out[i]     = osc_out;
-        out[i + 1] = osc_out;
+        out[i]     = sig;
+        out[i + 1] = sig;
     }
 }
 
@@ -77,20 +67,8 @@ int main(void)
     //Set the ADC to use our configuration
     hardware.adc.Init(&adcConfig, 1);
 
-    //Set up oscillator
-    osc.Init(samplerate);
-    osc.SetWaveform(osc.WAVE_SIN);
-    osc.SetAmp(2.f);
-    osc.SetFreq(1000);
-
-    //Set up volume envelope
-    env.Init(samplerate);
-    //Envelope segment times
-    env.SetTime(ADSR_SEG_ATTACK, .01f);
-    env.SetTime(ADSR_SEG_DECAY, .4f);
-    env.SetTime(ADSR_SEG_RELEASE, .4f);
-    //Hold at full level for as long as the button is held down
-    env.SetSustainLevel(1.f);
+    //Set up the shared oscillator + envelope
+    voice.Init(samplerate);
 
     //Start the adc
     hardware.adc.Start();

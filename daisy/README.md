@@ -8,7 +8,7 @@ Jordan
 
 Simple oscillator for daisy seed. Has button triggered envelope and knob controlled pitch.
 
-Based off of
+Based off of Osc example
 [Source Code](https://github.com/electro-smith/DaisyExamples/tree/master/seed/Osc)
 
 ## Breadboard

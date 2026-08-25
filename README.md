@@ -43,7 +43,15 @@ git submodule update --init
 For all Daisy commands use Git Bash.
 Ensure submodules are installed.
 
-$ cd into daisy 
+First time around build the submodules.
+```sh
+make -C libDaisy
+make -C DaisySP
+```sh
+
+This will only be needed to be done once, unless the submodules are updated.
+
+$ Now build the project. cd into daisy 
 
 ```sh
 cd daisy 

@@ -2,6 +2,10 @@ An experimental project to see if VCV Rack can be used to prototype Daisy hardwa
 
 Claude used to generate boilerplate.
 
+Features an Saw wave Oscillator, with a sustained envelope that is triggered on button press. 
+
+Daisy onboard light should also light up when button is pressed.
+
 ## Project layout
 
 ```

@@ -4,8 +4,12 @@ RACK_DIR ?= ../..
 # If DAISYSP_DIR is not defined when calling the Makefile, default to the sibling DaisySP checkout
 DAISYSP_DIR ?= ../DaisySP
 
+# The DSP this module shares with the Daisy firmware
+SHARED_DIR ?= ../shared
+
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS += -I$(DAISYSP_DIR)/Source
+FLAGS += -I$(SHARED_DIR)
 CFLAGS +=
 CXXFLAGS +=
 
@@ -27,6 +31,14 @@ DAISYSP_INCLUDES := $(addprefix -I, $(DAISYSP_DIR)/Source $(sort $(dir $(DAISYSP
 # Add .cpp files to the build
 SOURCES += $(wildcard src/*.cpp)
 SOURCES += $(wildcard src/dsp/*.cpp)
+
+# ../shared can't go in SOURCES: compile.mk would derive build/../shared/... and
+# write the objects outside build/. Compile them here and append to OBJECTS,
+# which compile.mk places after its own objects and links into $(TARGET).
+SHARED_SOURCES := $(wildcard $(SHARED_DIR)/*.cpp)
+SHARED_OBJECTS := $(patsubst $(SHARED_DIR)/%.cpp, build/shared/%.o, $(SHARED_SOURCES))
+OBJECTS += $(SHARED_OBJECTS)
+SHARED_DEPS := $(SHARED_OBJECTS:.o=.d)
 
 # Add files to the ZIP package when running `make dist`
 # The compiled plugin and "plugin.json" are automatically added.
@@ -50,4 +62,9 @@ build/daisysp/%.o: $(DAISYSP_DIR)/%.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(DAISYSP_INCLUDES) -std=c++14 -w -c -o $@ $<
 
--include $(DAISYSP_DEPS)
+# Our own code, so it keeps the plugin's warning flags.
+build/shared/%.o: $(SHARED_DIR)/%.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+-include $(DAISYSP_DEPS) $(SHARED_DEPS)

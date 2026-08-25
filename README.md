@@ -1,3 +1,27 @@
+## Project layout
+
+```
+shared/     SharedDSP.{h,cpp}  -- the voice. All DSP, no front panel.
+daisy/      template.cpp       -- Daisy hardware front panel (ADC knob, button, LED)
+vcv/        src/DaisyModule.cpp -- VCV front panel (knob, button, light, output)
+```
+
+`shared/` is compiled into both builds, so a change to the DSP lands on the
+hardware and in Rack at once. Prototype in VCV, then flash. Anything that reads
+a knob or drives an LED belongs in the host file, not in `shared/`.
+
+Both hosts call the same two functions:
+
+```cpp
+voice.Init(sample_rate);                 // and again if the rate changes
+float sig = voice.Process(knob, gate);   // knob 0..1, gate true while held
+```
+
+Note that `make -C DaisySP` builds DaisySP for the Daisy's Cortex-M7. The VCV
+plugin can't link those objects, so `vcv/Makefile` builds its own x86-64 copy of
+DaisySP into `vcv/build/`. You don't need to do anything for that -- `cd vcv && make`
+handles it -- but it does mean DaisySP gets compiled twice, once per target.
+
 ## Daisy Set up
 #clone with submodules
 git clone --recursive https://github.com/electro-smith/DaisyExamples

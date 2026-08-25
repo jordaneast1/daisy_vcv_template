@@ -1,66 +1,55 @@
 #include "plugin.hpp"
-#include "daisysp.h"
-
-using namespace daisysp;
+#include "SharedDSP.h"
 
 
 struct DaisyModule : Module {
-	Oscillator osc;
-	float blinkPhase = 0.f;
+	// All of the DSP lives in ../../shared, shared with the Daisy firmware.
+	// Everything in this file is VCV front panel.
+	shared::SharedDSP voice;
 
 	enum ParamId {
 		PITCH_PARAM,
+		GATE_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
-		PITCH_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
-		SINE_OUTPUT,
+		OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
-		BLINK_LIGHT,
+		GATE_LIGHT,
 		LIGHTS_LEN
 	};
 
 	DaisyModule() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(PITCH_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(PITCH_INPUT, "");
-		configOutput(SINE_OUTPUT, "");
+		// 0..1 is the Daisy ADC's range, so the knob lands on the same pitch on both.
+		configParam(PITCH_PARAM, 0.f, 1.f, 0.5f, "Pitch");
+		configButton(GATE_PARAM, "Gate");
+		configOutput(OUTPUT, "Sine");
 
-		osc.Init(APP->engine->getSampleRate());
-		osc.SetWaveform(Oscillator::WAVE_SIN);
-		osc.SetAmp(1.f);
+		voice.Init(APP->engine->getSampleRate());
 	}
 
 	void onSampleRateChange(const SampleRateChangeEvent& e) override {
-		osc.Init(e.sampleRate);
-		osc.SetWaveform(Oscillator::WAVE_SIN);
-		osc.SetAmp(1.f);
+		voice.Init(e.sampleRate);
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Compute the frequency from the pitch parameter and input
-		float pitch = params[PITCH_PARAM].getValue();
-		pitch += inputs[PITCH_INPUT].getVoltage();
-		// The default frequency is C4 = 261.6256f
-		float freq = dsp::FREQ_C4 * std::pow(2.f, pitch);
-		osc.SetFreq(freq);
+		// Stands in for the momentary button wired to the Daisy
+		bool gate = params[GATE_PARAM].getValue() > 0.f;
 
-		// Compute the sine output using the DaisySP oscillator
-		float sine = osc.Process();
+		float sig = voice.Process(params[PITCH_PARAM].getValue(), gate);
+
 		// Audio signals are typically +/-5V
 		// https://vcvrack.com/manual/VoltageStandards
-		outputs[SINE_OUTPUT].setVoltage(5.f * sine);
+		outputs[OUTPUT].setVoltage(5.f * sig);
 
-		// Blink light at 1Hz
-		blinkPhase += args.sampleTime;
-		if (blinkPhase >= 1.f)
-			blinkPhase -= 1.f;
-		lights[BLINK_LIGHT].setBrightness(blinkPhase < 0.5f ? 1.f : 0.f);
+		// The Daisy lights its onboard LED while the button is held; do the same here.
+		lights[GATE_LIGHT].setBrightness(gate ? 1.f : 0.f);
 	}
 };
 
@@ -77,11 +66,11 @@ struct DaisyModuleWidget : ModuleWidget {
 
 		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 46.063)), module, DaisyModule::PITCH_PARAM));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(15.24, 77.478)), module, DaisyModule::PITCH_INPUT));
+		addParam(createParamCentered<VCVButton>(mm2px(Vec(15.24, 77.478)), module, DaisyModule::GATE_PARAM));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24, 108.713)), module, DaisyModule::SINE_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24, 108.713)), module, DaisyModule::OUTPUT));
 
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(15.24, 25.81)), module, DaisyModule::BLINK_LIGHT));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(15.24, 25.81)), module, DaisyModule::GATE_LIGHT));
 	}
 };
 

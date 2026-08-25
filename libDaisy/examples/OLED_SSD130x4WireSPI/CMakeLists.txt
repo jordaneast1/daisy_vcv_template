@@ -1,3 +1,0 @@
-set(FIRMWARE_NAME OLED_SSD130x4WireSPI)
-set(FIRMWARE_SOURCES OLED_SSD130x4WireSPI.cpp)
-include(DaisyProject)

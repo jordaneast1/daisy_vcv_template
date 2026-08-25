@@ -26,7 +26,7 @@ plugin can't link those objects, so `vcv/Makefile` builds its own x86-64 copy of
 DaisySP into `vcv/build/`. You don't need to do anything for that -- `cd vcv && make`
 handles it -- but it does mean DaisySP gets compiled twice, once per target.
 
-## Daisy Set up
+## Set up
 clone with submodules
 ```
 git clone --recursive https://github.com/jordaneast1/daisy_vcv_template
@@ -39,7 +39,9 @@ git clone https://github.com/jordaneast1/daisy_vcv_template
 git submodule update --init
 ```
 
-shell for this on Windows is Git Bash
+## Set up and build Daisy
+For all Daisy commands use Git Bash.
+Ensure submodules are installed.
 
 $ cd into daisy 
 
@@ -72,7 +74,7 @@ Follow the VCV doucmentation setup for Windows carefully.
 https://vcvrack.com/manual/Building
 https://vcvrack.com/manual/PluginDevelopmentTutorial
 
-Using MinGW 64-bit shell from Msys2
+For all VCV commands use MinGW 64-bit shell from Msys2
 Ensure the VCV Rack-SDK is installed and set on $PATH
 
 

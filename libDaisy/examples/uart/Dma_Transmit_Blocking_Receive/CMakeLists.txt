@@ -1,3 +1,0 @@
-set(FIRMWARE_NAME Dma_Transmit_Blocking_Receive)
-set(FIRMWARE_SOURCES Dma_Transmit_Blocking_Receive.cpp)
-include(DaisyProject)

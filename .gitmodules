@@ -1,9 +1,6 @@
-[submodule "DaisySP"]
-	path = DaisySP
-	url = https://github.com/electro-smith/DaisySP
-	branch = master
-	ignore = untracked
 [submodule "libDaisy"]
 	path = libDaisy
 	url = https://github.com/electro-smith/libDaisy
-	ignore = untracked
+[submodule "DaisySP"]
+	path = DaisySP
+	url = https://github.com/electro-smith/DaisySP

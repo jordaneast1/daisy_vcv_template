@@ -1,0 +1,23 @@
+{
+  "slug": "TemplateDaisyVCV",
+  "name": "TemplateDaisyVCV",
+  "version": "2.0.0",
+  "license": "proprietary",
+  "brand": "TemplateDaisyVCV",
+  "author": "Jordan",
+  "authorEmail": "",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "DaisyModule",
+      "name": "DaisyModule",
+      "description": "",
+      "tags": []
+    }
+  ]
+}
